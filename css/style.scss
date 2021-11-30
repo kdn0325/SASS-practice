@@ -1,0 +1,94 @@
+@charset "utf-8";
+body{padding: 100px 20px; width: 600px; margin: 0 auto; border: 5px solid grey;}
+// 1.변수는 영(+숫) or _영소문자
+$grey: #666;
+$white: #fff;
+$blue: blue;
+$red: tomato;
+$fs24: 24px; //우와 폰사 줄여씀
+.btn1{display: block; width: 200px; height: 50px; line-height: 50px; font-size: 20px; color: $grey; background-color: $white; border: 1px solid $grey; text-align: center; &:hover{background-color: $grey; color: $white;}}
+.btn2{padding: 10px; font-size: $fs24; border: 1px solid $red; background-color: $blue; &:hover{background-color: $red;}}
+// -----------------------------------------------------------------------------------------------------------------
+// 2.선택자 연습: 자식 선택자, 종속 선택자
+.sass{color: $red; 
+    ul{border: 1px solid $red; 
+        >li{
+            background-color: pink;
+            a{text-decoration: none;
+                &:hover{color: $red;}
+                &.bbb{font-size: 12px;}
+            }
+            .bbb{text-decoration: underline 1px $grey;}
+            &:last-child{border: 1px dotted blue;}
+        }
+    }
+}
+// -----------------------------------------------------------------------------------------------------------------
+// 3.mixin & include / mixin=메소드가 들어있는 클래스
+@mixin test {
+    width: 100px; height: 100px; border: 1px solid $red; margin-bottom: 10px;
+}
+.test{@include test();} //include = mixin을 불러옴
+@mixin clear{
+    &:after{content: ''; display: block; clear: both; }
+}
+.clearfix{background-color: yellow; border: 3px solid #0086b3; @include clear();}
+.clearfix p{float: left; @include test();}
+// -----------------------------------------------------------------------------------------------------------------
+// 4.매개변수
+@mixin border($color) {
+    border: 1px solid $color; margin-bottom: 5px; padding: 5px; 
+}
+.var{@include border(blue)}
+.red{@include border(red)}
+.green{@include border(green); display: block}  //인라인 요소 span에 padding, margin류는 잘 안됨
+@mixin box($w, $h) {
+    width: $w; height: $h;
+}
+.var2{@include box(300px, 100px); background-color: lightyellow;}
+// -----------------------------------------------------------------------------------------------------------------
+// 5.문자보관법 #{} 속성 이름에 쓸때 문자로 인식시키게 돕기 위해서
+@mixin bx1($position, $wid, $color1) {
+    border-#{$position}: $wid solid $color1;
+}
+.string1{@include bx1(top,5px,skyblue)}
+.string2{@include bx1(left, 5px, orange); @include bx1(right, 5px, orange)}
+// -----------------------------------------------------------------------------------------------------------------
+// 6. 반복문
+.list li{background: no-repeat 0 50%/20px 20px; text-indent: 30px; line-height: 50px;}
+// .list li.ico1{background: url('../img/icon1.png') no-repeat;}
+// .list li.ico2{background: url('../img/icon2.png') no-repeat;}
+// .list li.ico3{background: url('../img/icon3.png') no-repeat;}
+// .list li.ico4{background: url('../img/icon4.png') no-repeat;}
+// .list li.ico5{background: url('../img/icon5.png') no-repeat;}
+// for(초기값,조건,증감식){}
+@for $i from 1 to 6{
+    .list li.ico#{$i}{background-image: url('../img/ico#{$i}.png');}
+    .list li:nth-child(#{$i})::before{content: '제목 #{$i}'; }
+}
+// -----------------------------------------------------------------------------------------------------------------
+// 7. each문
+@each $var in book, zoom, new {
+    .ico_#{$var}{background: url('../img/ico_#{$var}.png') no-repeat 0 50%/30px 30px; line-height: 50px; }
+}
+$heading:(h1:30px, h2:20px, h3:15px);
+@each $ele, $fs in $heading {
+    #{$ele}{font-size: $fs;}
+}
+// -----------------------------------------------------------------------------------------------------------------
+// 8. if문
+@mixin btn_radius($h, $radius:true) {
+    padding: 0 20px; height: $h; line-height: $h; text-align: center; background-color: #000; color: #fff;
+    @if $radius {
+        border-radius: $h/2;
+    }@else{border: 1px solid tomato;}
+}
+.btn{@include btn_radius(50px, false)}
+@mixin position($x, $y, $z) {
+    position: absolute; left: $x; top: $y; z-index: $z;
+    @if ($x==50% and &y==50%) {
+        transform: translate(-50%,-50%);
+    }@else if($x==50%){transform: translateX(-50%);}
+    @else if($y==50%){transform: translateY(-50%);}
+}
+.if{width: 100px; height: 100px; background-color: turquoise; @include position(50%, null, 2);}
